@@ -11,18 +11,20 @@ $ npm install --save aspects-js
 
 ## 2.Usage
 You need require aspects-js at first of entry js file
-```
+```javascript
 require('aspects-js');
 ```
 
 ## 3.Add aspect
 Add a js file to write a aspect.
 First, you should require class Aspect from aspects-js.
-``` file: testAspect.js
+```javascript
+//file: testAspect.js
 const { Aspect } = require('aspects-js');
 ```
 Secondly, you should declare a class extends Aspect and implements property `pointcut` and function for join point.
-``` file: testAspect.js
+```javascript
+//file: testAspect.js
 class TestAspect extends Aspect {
     get pointcut() { return '*.do*()' },
     before() { console.log('this is for before join point') },
@@ -30,11 +32,13 @@ class TestAspect extends Aspect {
 }
 ````
 Then, you should exports a instance of your class which is extends Aspect
-``` file: testAspect.js
+```javascript
+//file: testAspect.js
 module.exports = new TestAspect();
 ```
 At last, require you aspect
-``` file: entry.js
+```javascript
+//file: entry.js
 require('./testAspect.js');
 ```
 Now, all classes when you required will be cut by all your aspect.
@@ -77,30 +81,30 @@ class Pointcut {
 
 ## 5.Pointcut
 ### 1.Normal
-```
+```javascript
 "ClassName.FunctionName()"
 ```
 ### 2.Execution
-```
+```javascript
 "execution(ClassName.FunctionName())"
 ```
 ### 3.Within
-```
+```javascript
 "within(ClassName)"
 ```
 
 ### 4.Wildcards
 #### 1: ```*``` Match all word
-```
+```javascript
 "*Service.do*()"
 ```
 Match all methods which's name is start with "do" and in classes which's name is end with "Service"
 #### 2: ```?``` Match one word
-```
+```javascript
 "you?.do?()"
 ```
 #### 3: ```+``` Or operate
-```
+```javascript
 "within(Test1+Test2)"
 ```
 Just match all methods in classes which's name is "Test1" or "Test2"
