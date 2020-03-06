@@ -17,12 +17,12 @@ require('aspects-js');
 
 ## 3.Add aspect
 Add a js file to write a aspect.
-First, you should require class Aspect from aspects-js.
+First, you should require class `Aspect` from aspects-js.
 ```javascript
 //file: testAspect.js
 const { Aspect } = require('aspects-js');
 ```
-Secondly, you should declare a class extends Aspect and implements property `pointcut` and function for join point.
+Secondly, you should declare a class extends Aspect and implements property `pointcut` and functions for join point.
 ```javascript
 //file: testAspect.js
 class TestAspect extends Aspect {
@@ -31,20 +31,20 @@ class TestAspect extends Aspect {
     after() { console.log('this is for after join point') }
 }
 ````
-Then, you should exports a instance of your class which is extends Aspect
+Then, you should exports a instance of your class which is extends `Aspect`
 ```javascript
 //file: testAspect.js
 module.exports = new TestAspect();
 ```
-At last, require you aspect
+At last, require your aspects at entry.js file
 ```javascript
 //file: entry.js
 require('./testAspect.js');
 ```
-Now, all classes when you required will be cut by all your aspect.
+Now, all classes when you required will be cut by all your aspects.
 
-## 4.API
-### class Aspect
+## 4.Classes and Interfaces
+### Interface Aspect
 ```typescript
 interface Aspect {
     readonly pointcut: Pointcut | string;
@@ -57,7 +57,7 @@ interface Aspect {
 }
 ```
 
-### class JoinPoint
+### Class JoinPoint
 ```typescript
 class JoinPoint {
     readonly type: Class;
@@ -70,7 +70,7 @@ class JoinPoint {
 }
 ```
 
-### class Pointcut
+### Class Pointcut
 ```typescript
 class Pointcut {
     constructor(pointcut: string);
@@ -79,7 +79,7 @@ class Pointcut {
 }
 ```
 
-## 5.Pointcut
+## 5.Pointcut expression
 ### 1.Normal
 ```javascript
 "ClassName.FunctionName()"
@@ -94,16 +94,16 @@ class Pointcut {
 ```
 
 ### 4.Wildcards
-#### 1: ```*``` Match all word
+#### > `*` Match all word
 ```javascript
 "*Service.do*()"
 ```
 Match all methods which's name is start with "do" and in classes which's name is end with "Service"
-#### 2: ```?``` Match one word
+#### > `?` Match one word
 ```javascript
 "you?.do?()"
 ```
-#### 3: ```+``` Or operate
+#### > `+` Or operate
 ```javascript
 "within(Test1+Test2)"
 ```
