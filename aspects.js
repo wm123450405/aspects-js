@@ -2,15 +2,15 @@ const isClass = type => typeof type === 'function' && type.toString().startsWith
 
 const registeredAspects = [];
 
-const normalReg = /^(?<typeNames>([\w\*][\w\d\*]*)(?:\+[\w\*][\w\d\*]*)*)(?:\.(?<funNames>([\w\*][\w\d\*]*)(?:\+[\w\*][\w\d\*]*)*)(?:\(\))?)?$/ig;
-const executionReg = /^execution\((?<typeNames>([\w\*][\w\d\*]*)(?:\+[\w\*][\w\d\*]*)*)(?:\.(?<funNames>([\w\*][\w\d\*]*)(?:\+[\w\*][\w\d\*]*)*)(?:\(\))?)?\)$/ig;
-const withinReg = /^within\((?<typeNames>([\w\*][\w\d\*]*)(?:\+[\w\*][\w\d\*]*)*)\)$/ig;
+const normalReg = /^(?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\.(?<funNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\(\))?)?$/ig;
+const executionReg = /^execution\((?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\.(?<funNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\(\))?)?\)$/ig;
+const withinReg = /^within\((?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)\)$/ig;
 
 const originType = Symbol.for('originType');
 
 class Matcher {
     constructor(name) {
-        this.name = new RegExp('^' + name.replace(/\*/ig, '.+') + '$', 'ig');
+        this.name = new RegExp('^' + name.replace(/\*/ig, '[_\\w\\d]+').replace(/\?/ig, '[_\\w\\d]') + '$', 'ig');
     }
 
     matches(value) {
