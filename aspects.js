@@ -2,9 +2,9 @@ const isClass = type => typeof type === 'function' && type.toString().startsWith
 
 const registeredAspects = [];
 
-const normalReg = /^(?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\.(?<funNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\(\))?)?$/ig;
-const executionReg = /^execution\((?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\.(?<funNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)(?:\(\))?)?\)$/ig;
-const withinReg = /^within\((?<typeNames>([_\w\*][_\w\d\*]*)(?:\+[_\w\*][_\w\d\*]*)*)\)$/ig;
+const normalReg = /^(?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\.(?<funNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\((?<params>[,_\w\d\?\*\.\|]*)\))?)?$/ig;
+const executionReg = /^execution\((?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\.(?<funNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\((?<params>[,_\w\d\?\*\.\|]*)\))?)?\)$/ig;
+const withinReg = /^within\((?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)\)$/ig;
 
 const originType = Symbol.for('originType');
 
@@ -18,6 +18,15 @@ class Matcher {
         return this.name.test(typeof value === 'function' ? value.name : value);
     }
 }
+class ParamsMatcher {
+    constructor(params) {
+        this.params = params.split(',');
+    }
+
+    matches(args) {
+        return true;
+    }
+}
 
 class Pointcut {
     constructor(pointcut) {
@@ -26,18 +35,21 @@ class Pointcut {
         if (match) {
             this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
             this.funMatchers = (match.groups.funNames || '*').split(/\+/ig).map(funName => new Matcher(funName));
+            this.paramsMatcher = new ParamsMatcher(match.groups.params || '..');
         } else {
             executionReg.lastIndex = 0;
             match = executionReg.exec(pointcut);
             if (match) {
                 this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
                 this.funMatchers = (match.groups.funNames || '*').split(/\+/ig).map(funName => new Matcher(funName));
+                this.paramsMatcher = new ParamsMatcher(match.groups.params || '..');
             } else {
                 withinReg.lastIndex = 0;
                 match = withinReg.exec(pointcut);
                 if (match) {
                     this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
                     this.funMatchers = [new Matcher('*')];
+                    this.paramsMatcher = new ParamsMatcher('..');
                 } else {
                     throw new TypeError('Not a valid pointcut:' + pointcut);
                 }
@@ -47,6 +59,9 @@ class Pointcut {
 
     matches(type, fun) {
         return this.typeMatchers.some(typeMatcher => typeMatcher.matches(type)) && this.funMatchers.some(funMatcher => funMatcher.matches(fun));
+    }
+    matchParams(args) {
+        return this.paramsMatcher.matches(args);
     }
 }
 
@@ -153,24 +168,28 @@ const executeChain = (type, fun, proxy, thisArg, args, aspects, index) => {
         Reflect.apply(fun, thisArg, args);
     } else {
         let aspect = aspects[index];
-        let joinPoint = new JoinPoint(type, fun, thisArg, proxy, args, args => executeChain(type, fun, proxy, thisArg, args, aspects, ++index));
-        let error, result;
-        try {
-            aspect.before(joinPoint);
-            result = aspect.around(joinPoint);
-            let resultTemp = aspect.afterReturn(joinPoint, result);
-            result = typeof resultTemp === 'undefined' ? result : resultTemp;
-            return result;
-        } catch (e) {
-            error = e;
+        if (aspect.pointcut.matchParams(args)) {
+            let joinPoint = new JoinPoint(type, fun, thisArg, proxy, args, args => executeChain(type, fun, proxy, thisArg, args, aspects, ++index));
+            let error, result;
             try {
-                aspect.afterThrow(joinPoint, e);
-            } catch (ie) {
-                error = ie;
-                throw ie;
+                aspect.before(joinPoint);
+                result = aspect.around(joinPoint);
+                let resultTemp = aspect.afterReturn(joinPoint, result);
+                result = typeof resultTemp === 'undefined' ? result : resultTemp;
+                return result;
+            } catch (e) {
+                error = e;
+                try {
+                    aspect.afterThrow(joinPoint, e);
+                } catch (ie) {
+                    error = ie;
+                    throw ie;
+                }
+            } finally {
+                aspect.after(joinPoint, result, error);
             }
-        } finally {
-            aspect.after(joinPoint, result, error);
+        } else {
+            return joinPoint.proceed();
         }
     }
 };
