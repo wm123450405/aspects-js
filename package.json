@@ -4,8 +4,12 @@
   "description": "",
   "main": "aspects.js",
   "scripts": {
-    "test": "node test/test.js"
+    "test": "node test/test.js",
+    "ast": "node test/ast.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "engines": {
+    "node": ">=10.0.0"
+  }
 }

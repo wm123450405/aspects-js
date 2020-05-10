@@ -31,7 +31,7 @@ class TestAspect extends Aspect {
     after() { console.log('this is for after join point') }
 }
 ````
-Then, you should exports a instance of your class which is extends `Aspect`
+Then, you should exports an instance of your class which is extends `Aspect`
 ```javascript
 //file: testAspect.js
 module.exports = new TestAspect();
