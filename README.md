@@ -100,12 +100,12 @@ class Pointcut {
 ```
 
 ### 4.Operators
-#### > `*` Match all word **Wildcards**
+#### > `*` Match all word *`wildcards`*
 ```javascript
 "*Service.do*()"
 ```
 Match all methods which's a name is start with `do` and in classes which's a name is end with `Service`
-#### > `?` Match one word **Wildcards**
+#### > `?` Match one word *`wildcards`*
 ```javascript
 "you?.do?()"
 ```
