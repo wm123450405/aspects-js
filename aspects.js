@@ -1,67 +1,16 @@
-const isClass = type => typeof type === 'function' && type.toString().startsWith('class');
+const { isClass } = require('./utils');
+const { AST } = require('./ast');
 
 const registeredAspects = [];
 
-const normalReg = /^(?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\.(?<funNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\((?<params>[,_\w\d\?\*\.\|]*)\))?)?$/ig;
-const executionReg = /^execution\((?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\.(?<funNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)(?:\((?<params>[,_\w\d\?\*\.\|]*)\))?)?\)$/ig;
-const withinReg = /^within\((?<typeNames>([_\w\*\?][_\w\d\*\?]*)(?:\+[_\w\*\?][_\w\d\*\?]*)*)\)$/ig;
-
 const originType = Symbol.for('originType');
-
-class Matcher {
-    constructor(name) {
-        this.name = new RegExp('^' + name.replace(/\*/ig, '[_\\w\\d]+').replace(/\?/ig, '[_\\w\\d]') + '$', 'ig');
-    }
-
-    matches(value) {
-        this.name.lastIndex = 0;
-        return this.name.test(typeof value === 'function' ? value.name : value);
-    }
-}
-class ParamsMatcher {
-    constructor(params) {
-        this.params = params.split(',');
-    }
-
-    matches(args) {
-        return true;
-    }
-}
 
 class Pointcut {
     constructor(pointcut) {
-        normalReg.lastIndex = 0;
-        let match = normalReg.exec(pointcut);
-        if (match) {
-            this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
-            this.funMatchers = (match.groups.funNames || '*').split(/\+/ig).map(funName => new Matcher(funName));
-            this.paramsMatcher = new ParamsMatcher(match.groups.params || '..');
-        } else {
-            executionReg.lastIndex = 0;
-            match = executionReg.exec(pointcut);
-            if (match) {
-                this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
-                this.funMatchers = (match.groups.funNames || '*').split(/\+/ig).map(funName => new Matcher(funName));
-                this.paramsMatcher = new ParamsMatcher(match.groups.params || '..');
-            } else {
-                withinReg.lastIndex = 0;
-                match = withinReg.exec(pointcut);
-                if (match) {
-                    this.typeMatchers = (match.groups.typeNames || '*').split(/\+/ig).map(typeName => new Matcher(typeName));
-                    this.funMatchers = [new Matcher('*')];
-                    this.paramsMatcher = new ParamsMatcher('..');
-                } else {
-                    throw new TypeError('Not a valid pointcut:' + pointcut);
-                }
-            }
-        }
+        this.ast = AST.compile(pointcut);
     }
-
-    matches(type, fun) {
-        return this.typeMatchers.some(typeMatcher => typeMatcher.matches(type)) && this.funMatchers.some(funMatcher => funMatcher.matches(fun));
-    }
-    matchParams(args) {
-        return this.paramsMatcher.matches(args);
+    matches(context) {
+        return this.ast.execute(context);
     }
 }
 
@@ -156,10 +105,13 @@ class JoinPoint {
             },
         })
     }
+    toString() {
+        return this.type.name + '.' + this.fun.name + '(' + this.args.join(',') + ')';
+    }
 }
 
 const findAspects = (type, fun) => {
-    return registeredAspects.filter(aspect => aspect.pointcut.matches(type, fun));
+    return registeredAspects.filter(aspect => aspect.pointcut.matches({ type, fun }));
 };
 
 const executeChain = (type, fun, proxy, thisArg, args, aspects, index) => {
@@ -168,7 +120,7 @@ const executeChain = (type, fun, proxy, thisArg, args, aspects, index) => {
         Reflect.apply(fun, thisArg, args);
     } else {
         let aspect = aspects[index];
-        if (aspect.pointcut.matchParams(args)) {
+        if (aspect.pointcut.matches({ type, fun, args })) {
             let joinPoint = new JoinPoint(type, fun, thisArg, proxy, args, args => executeChain(type, fun, proxy, thisArg, args, aspects, ++index));
             let error, result;
             try {

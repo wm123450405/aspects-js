@@ -2,11 +2,11 @@ const { Aspect } = require('../aspects.js');
 
 class TestAspect extends Aspect {
     get pointcut() { return '*.do*()' }
-    before() {
-        console.log('这里是前置切面');
+    before(joinPoint) {
+        console.log('这里是前置切面:' + joinPoint.toString());
     }
-    after() {
-        console.log('这里是后置切面');
+    after(joinPoint, result, error) {
+        console.log('这里是后置切面:' + joinPoint.toString() + ', 返回结果为:' + result);
     }
 }
 
