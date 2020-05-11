@@ -99,13 +99,13 @@ class Pointcut {
 "FunctionName(Type1,..,Type2)"
 ```
 
-### 4.Wildcards
-#### > `*` Match all word
+### 4.Operators
+#### > `*` Match all word **Wildcards**
 ```javascript
 "*Service.do*()"
 ```
 Match all methods which's a name is start with `do` and in classes which's a name is end with `Service`
-#### > `?` Match one word
+#### > `?` Match one word **Wildcards**
 ```javascript
 "you?.do?()"
 ```
