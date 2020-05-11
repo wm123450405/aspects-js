@@ -223,6 +223,81 @@ assert.strictEqual(false, AST.compile('Test1+Test2.abc+bcd').execute({
     args: []
 }));
 
+//or
+assert.strictEqual(true, AST.compile('Test.abc|Test2.def').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('Test2.def|Test.abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('Test2.def|within(Test)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('Test2.def|within(Test1)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+//and
+assert.strictEqual(true, AST.compile('within(Test)&abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('within(Test1)&abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('within(Test)&bef').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+//merge
+assert.strictEqual(true, AST.compile('within(Test)&abc|Test2.def').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('Test2.def|within(Test)&abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('(Test2.def|within(Test))&abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('(def|abc)&(within(Test)|within(Test2))').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('within(Test)&def|abc').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+//not
+assert.strictEqual(true, AST.compile('within(Test)&!bef').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(true, AST.compile('bcd|!bef').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+
 //execution
 assert.strictEqual(false, AST.compile('execution(Test+Test2.bcd)').execute({
     type: Test,

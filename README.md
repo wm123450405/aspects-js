@@ -92,19 +92,59 @@ class Pointcut {
 ```javascript
 "within(ClassName)"
 ```
+### 4.Arguments
+```javascript
+"FunctionName(..)"
+"FunctionName(Type1,Type2)"
+"FunctionName(Type1,..,Type2)"
+```
 
 ### 4.Wildcards
 #### > `*` Match all word
 ```javascript
 "*Service.do*()"
 ```
-Match all methods which's name is start with "do" and in classes which's name is end with "Service"
+Match all methods which's a name is start with `do` and in classes which's a name is end with `Service`
 #### > `?` Match one word
 ```javascript
 "you?.do?()"
 ```
-#### > `+` Or operate
+#### > `+` Or operate for name
 ```javascript
 "within(Test1+Test2)"
 ```
-Just match all methods in classes which's name is "Test1" or "Test2"
+Just match all methods in classes which's a name is `Test1` or `Test2`
+#### > `|`,`||` Or operate for condition
+```javascript
+"within(Test1)|within(Test2)"
+```
+#### > `&`,`&&` And operator for condition
+```javascript
+"within(Test1)&abc"
+```
+Just match method `abc` in class `Test1`
+Just match all methods in classes which's a name is `Test1` or `Test2`
+#### > `!` Not operate for condition
+```javascript
+"!within(Test)"
+```
+match all methods except the methods in class `Test`
+#### > `()` Brackets operator for condition
+Increase the priority of expressions
+#### > `()` Call operator for function
+```javascript
+"abc()"
+"abc(..)"
+```
+Match all methods which's a name is `abc`
+```javascript
+"abc(Type1)"
+```
+Match all methods which's a name is `abc` and has one argument that instance of class `Type1`
+#### > `,` Split operator for arguments
+```javascript
+"*(Type1,Type2)"
+```
+Match all methods which has two arguments that then first one is instance of class `Type1` and the second one is instance of class `Type2`
+#### > `..` Multiple arguments operator for arguments
+Match none or multiple arguments
