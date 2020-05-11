@@ -242,7 +242,13 @@ class ASTCompiler {
                     } else if (inProperty) {
                         unshift(new ASTFunction(token));
                     } else {
-                        unshift(new ASTValue(token));
+                        if (token.value === 'execution') {
+                            unshift(new ASTExecution(token));
+                        } else if (token.value === 'within') {
+                            unshift(new ASTWithin(token));
+                        } else {
+                            unshift(new ASTValue(token));
+                        }
                     }
             }
             //console.debug('stocks---')
@@ -268,7 +274,7 @@ class ASTCompiler {
     }
 }
 
-const PRIORITIES = [',', '..', '|', '&', '!', '.', '+', '()'];
+const PRIORITIES = [',', '..', '|', '&', '!', '.', '+', 'keyword', '()'];
 
 
 class ASTOperator {
@@ -461,6 +467,34 @@ class ASTNot extends ASTUnaryOperator {
     }
     execute(context) {
         return !this.value.execute(context);
+    }
+}
+class ASTExecution extends ASTUnaryOperator {
+    constructor(token) {
+        super(token);
+    }
+    get priority() {
+        return PRIORITIES.indexOf('keyword');
+    }
+    toString() {
+        return `execution${this.value}`;
+    }
+    execute(context) {
+        return this.value.execute(context);
+    }
+}
+class ASTWithin extends ASTUnaryOperator {
+    constructor(token) {
+        super(token);
+    }
+    get priority() {
+        return PRIORITIES.indexOf('keyword');
+    }
+    toString() {
+        return `within${this.value}`;
+    }
+    execute(context) {
+        return this.value.execute(namesByType(context.type));
     }
 }
 

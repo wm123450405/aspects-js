@@ -169,6 +169,21 @@ assert.strictEqual(false, AST.compile('Test2.*').execute({
     fun: test.abc,
     args: []
 }));
+assert.strictEqual(true, AST.compile('within(Test)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('within(Tes)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('within(Test2)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
 
 //type name and function name
 assert.strictEqual(true, AST.compile('Test.abc').execute({
@@ -203,6 +218,18 @@ assert.strictEqual(false, AST.compile('Test+Test2.bcd').execute({
     args: []
 }));
 assert.strictEqual(false, AST.compile('Test1+Test2.abc+bcd').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+
+//execution
+assert.strictEqual(false, AST.compile('execution(Test+Test2.bcd)').execute({
+    type: Test,
+    fun: test.abc,
+    args: []
+}));
+assert.strictEqual(false, AST.compile('execution(Test1+Test2.abc+bcd)').execute({
     type: Test,
     fun: test.abc,
     args: []
