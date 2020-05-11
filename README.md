@@ -146,5 +146,10 @@ Match all methods which's a name is `abc` and has one argument that instance of 
 "*(Type1,Type2)"
 ```
 Match all methods which has two arguments that then first one is instance of class `Type1` and the second one is instance of class `Type2`
+#### > `.` Property operator for search methods of classes
+```javascript
+"Test.abc()"
+```
+Match the method `abc` of class `Test`
 #### > `..` Multiple arguments operator for arguments
 Match none or multiple arguments
