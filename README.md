@@ -1,6 +1,8 @@
 # aspects-js
 aspects-js
 
+[中文](readme.ZH-CN.md)
+
 Use aspect in node js
 
 ## 1.Install
@@ -16,13 +18,13 @@ require('aspects-js');
 ```
 
 ## 3.Add aspect
-Add a js file to write a aspect.
+Add a js file to write an aspect.
 First, you should require class `Aspect` from aspects-js.
 ```javascript
 //file: testAspect.js
 const { Aspect } = require('aspects-js');
 ```
-Secondly, you should declare a class extends Aspect and implements property `pointcut` and functions for join point.
+Secondly, you should declare a class extends `Aspect` and implements property `pointcut` and functions for join point.
 ```javascript
 //file: testAspect.js
 class TestAspect extends Aspect {
@@ -44,7 +46,7 @@ require('./testAspect.js');
 Now, all classes when you required will be cut by all your aspects.
 
 ## 4.Classes and Interfaces
-### Interface Aspect
+### Interface `Aspect`
 ```typescript
 interface Aspect {
     readonly pointcut: Pointcut | string;
@@ -57,7 +59,7 @@ interface Aspect {
 }
 ```
 
-### Class JoinPoint
+### Class `JoinPoint`
 ```typescript
 class JoinPoint {
     readonly type: Class;
@@ -70,7 +72,7 @@ class JoinPoint {
 }
 ```
 
-### Class Pointcut
+### Class `Pointcut`
 ```typescript
 class Pointcut {
     constructor(pointcut: string);
@@ -84,11 +86,11 @@ class Pointcut {
 ```javascript
 "ClassName.FunctionName()"
 ```
-### 2.Execution
+### 2.Keyword `execution`
 ```javascript
 "execution(ClassName.FunctionName())"
 ```
-### 3.Within
+### 3.Keyword `within`
 ```javascript
 "within(ClassName)"
 ```
@@ -99,7 +101,7 @@ class Pointcut {
 "FunctionName(Type1,..,Type2)"
 ```
 
-### 4.Operators
+### 4.Operators and wildcards
 #### > `*` Match all word *`wildcards`*
 ```javascript
 "*Service.do*()"
@@ -118,12 +120,12 @@ Just match all methods in classes which's a name is `Test1` or `Test2`
 ```javascript
 "within(Test1)|within(Test2)"
 ```
+Just match all methods in classes which's a name is `Test1` or `Test2`
 #### > `&`,`&&` And operator for condition
 ```javascript
 "within(Test1)&abc"
 ```
 Just match method `abc` in class `Test1`
-Just match all methods in classes which's a name is `Test1` or `Test2`
 #### > `!` Not operate for condition
 ```javascript
 "!within(Test)"
