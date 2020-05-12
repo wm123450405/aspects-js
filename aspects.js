@@ -7,10 +7,20 @@ const originType = Symbol.for('originType');
 
 class Pointcut {
     constructor(pointcut) {
-        this.ast = AST.compile(pointcut);
+        this.ast = pointcut ? AST.compile(pointcut) : { execute() { return true; } };
     }
     matches(context) {
         return this.ast.execute(context);
+    }
+}
+
+class MatchesPointcut extends Pointcut {
+    constructor(matchFunction) {
+        super();
+        this.matchFunction = matchFunction;
+    }
+    matches(context) {
+        return this.matchFunction.call(this, context);
     }
 }
 
@@ -43,7 +53,7 @@ class Aspects {
 class AspectDelegate {
     constructor(aspect) {
         this.delegate = aspect;
-        this.pointcut = aspect.pointcut instanceof Pointcut ? aspect.pointcut : new Pointcut(aspect.pointcut);
+        this.pointcut = aspect.pointcut instanceof Pointcut ? aspect.pointcut : typeof aspect.pointcut === 'function' || aspect.pointcut instanceof Function ? new MatchesPointcut(aspect.pointcut) : new Pointcut(aspect.pointcut);
     }
 
     after(joinPoint, result, error) {

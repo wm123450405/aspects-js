@@ -1,14 +1,20 @@
 declare namespace Aspects {
-    class Class { }
+    type Class = { new(...args: any[]): any; };
+
+    export class Context {
+        readonly type: Class;
+        readonly fun: Function;
+        readonly args: any[];
+    }
 
     export class Pointcut {
-        constructor(pointcut: string);
+        constructor(pointcut: string | ((context: Context) => boolean));
 
-        matches(type: Class | Function): boolean;
+        matches(context: Context): boolean;
     }
 
     export interface Aspect {
-        readonly pointcut: Pointcut | string;
+        readonly pointcut: Pointcut | string | ((context: Context) => boolean);
 
         after(joinPoint: JoinPoint, result: any, error: Error): void;
         afterReturn(joinPoint: JoinPoint, result: any): any;
