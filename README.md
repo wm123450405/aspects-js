@@ -49,7 +49,8 @@ Now, all classes when you required will be cut by all your aspects.
 ### Interface `Aspect`
 ```typescript
 interface Aspect {
-    readonly pointcut: Pointcut | string;
+    readonly pointcut: Pointcut | string | ((joinPoint: JoinPoint) => boolean);
+    readonly order: number;
 
     after(joinPoint: JoinPoint, result: any, error: Error);
     afterReturn(joinPoint: JoinPoint, result: any): any;
@@ -77,7 +78,7 @@ class JoinPoint {
 class Pointcut {
     constructor(pointcut: string);
 
-    matches(type: Class | Function): boolean;
+    matches(joinPoint: JoinPoint): boolean;
 }
 ```
 
@@ -155,3 +156,15 @@ Match all methods which has two arguments that then first one is instance of cla
 Match the method `abc` of class `Test`
 #### > `..` Multiple arguments operator for arguments
 Match none or multiple arguments
+
+### 5.Others
+#### `order` property of interface `Aspects`
+The Higher precedence when the value is lower
+
+### 6.Updates and releases
+#### 1.0.2.pre
+support function for pointcut
+add property `order` for class `Aspects`
+
+#### 1.0.1
+use AST for pointcut

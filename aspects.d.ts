@@ -15,6 +15,7 @@ declare namespace Aspects {
 
     export interface Aspect {
         readonly pointcut: Pointcut | string | ((context: Context) => boolean);
+        readonly order: number;
 
         after(joinPoint: JoinPoint, result: any, error: Error): void;
         afterReturn(joinPoint: JoinPoint, result: any): any;

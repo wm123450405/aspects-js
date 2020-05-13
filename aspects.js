@@ -29,6 +29,10 @@ class Aspects {
         return "*.*"
     }
 
+    get order() {
+        return 0;
+    }
+
     after(joinPoint, result, error) {
 
     }
@@ -54,6 +58,10 @@ class AspectDelegate {
     constructor(aspect) {
         this.delegate = aspect;
         this.pointcut = aspect.pointcut instanceof Pointcut ? aspect.pointcut : typeof aspect.pointcut === 'function' || aspect.pointcut instanceof Function ? new MatchesPointcut(aspect.pointcut) : new Pointcut(aspect.pointcut);
+    }
+
+    get order() {
+        return this.delegate.order;
     }
 
     after(joinPoint, result, error) {
@@ -121,7 +129,7 @@ class JoinPoint {
 }
 
 const findAspects = (type, fun) => {
-    return registeredAspects.filter(aspect => aspect.pointcut.matches({ type, fun }));
+    return registeredAspects.filter(aspect => aspect.pointcut.matches({ type, fun })).sort((a, b) => b.order - a.order);
 };
 
 const executeChain = (type, fun, proxy, thisArg, args, aspects, index) => {

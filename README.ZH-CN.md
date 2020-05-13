@@ -49,7 +49,8 @@ require('./testAspect.js');
 ### `Aspect`接口
 ```typescript
 interface Aspect {
-    readonly pointcut: Pointcut | string;
+    readonly pointcut: Pointcut | string | ((joinPoint: JoinPoint) => boolean);
+    readonly order: number;
 
     after(joinPoint: JoinPoint, result: any, error: Error);
     afterReturn(joinPoint: JoinPoint, result: any): any;
@@ -77,7 +78,7 @@ class JoinPoint {
 class Pointcut {
     constructor(pointcut: string);
 
-    matches(type: Class | Function): boolean;
+    matches(joinPoint: JoinPoint): boolean;
 }
 ```
 
@@ -155,3 +156,16 @@ class Pointcut {
 匹配`Test`类中的`abc`方法
 #### > `..` Multiple arguments operator for arguments
 匹配连续的多个参数类型
+
+
+### 5.其他
+#### `Aspects`接口的`order`属性
+此属性用于控制切面的执行顺序,值越小优先级越高
+
+### 6.更新与发布
+#### 1.0.2 未发布
+增加pointcut可以使用函数作为值
+接口`Aspects`增加属性`order`,用于控制切面的执行顺序
+
+#### 1.0.1
+在pointcut中使用AST的方式代替正则
