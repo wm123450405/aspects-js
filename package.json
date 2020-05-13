@@ -11,5 +11,11 @@
   "license": "ISC",
   "engines": {
     "node": ">=10.0.0"
-  }
+  },
+  "keywords": [
+    "aspect",
+    "aspects",
+    "aop",
+    "pointcut"
+  ]
 }
