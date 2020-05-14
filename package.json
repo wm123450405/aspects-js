@@ -1,21 +1,32 @@
 {
   "name": "aspects-js",
   "version": "1.0.2",
-  "description": "",
+  "description": "use aop in nodejs",
   "main": "aspects.js",
   "scripts": {
     "test": "node test/test.js",
     "ast": "node test/ast.js"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wm123450405/aspects-js"
+  },
+  "author": "wm123450405",
+  "license": "MIT",
   "engines": {
     "node": ">=10.0.0"
   },
+  "bugs": {
+    "url": "https://github.com/wm123450405/aspects-js/issues"
+  },
+  "homepage": "https://github.com/wm123450405/aspects-js#readme",
+  "types": "aspects.d.ts",
   "keywords": [
     "aspect",
     "aspects",
     "aop",
-    "pointcut"
+    "pointcut",
+    "joinpoint",
+    "advice"
   ]
 }
